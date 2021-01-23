@@ -36,7 +36,7 @@ def main(args):
         }	
     \end{document}
     '''
-    
+
     args = parser.parse_args()
     formula_tex_file = os.path.join(output_dir, 'formula.tex')
     with open(formula_tex_file,'w') as f:
@@ -61,6 +61,7 @@ def main(args):
     output_image_file = os.path.join(output_dir, f'formula-{image_files_number}.png')
 
     for page in pages:
+        # help: https://stackoverflow.com/questions/15474628/crop-the-border-of-an-image-using-pil
         nonwhite_positions = [(x,y) for x in range(page.size[0]) for y in range(page.size[1]) if page.getdata()[x+y*page.size[0]] != (255,255,255)]
         rect = (min([x for x,y in nonwhite_positions]), min([y for x,y in nonwhite_positions]), max([x for x,y in nonwhite_positions]), max([y for x,y in nonwhite_positions]))
         page.crop(rect).save(output_image_file, 'PNG')
