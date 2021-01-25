@@ -1,13 +1,19 @@
 \documentclass[x11names]{report}
 \usepackage{xcolor}
+\usepackage{amsmath}
 \definecolor{lightkhaki}{rgb}{0.94, 0.9, 0.55}
 \thispagestyle{empty}
+\renewcommand\arraystretch{1.2}
 \renewcommand\fbox{\fcolorbox{lightkhaki}{lightkhaki}}
+\newcommand{\specialMatrix}[1]{
+	\begin{pmatrix}#1\end{pmatrix}
+}
 \begin{document}
-	\pagecolor{yellow}
 	\centering
-	\setlength{\fboxsep}{2em}
+	\setlength{\fboxsep}{0.2em}
 	\fbox{
-		$\displaystyle I = \int_0^h y^2\mathrm{d}A$
+		$\displaystyle \specialMatrix{a_{1}& u_{2}& \frac{a_{1}}{d}u_{3}\\
+			a_{2}& u_{1}& \frac{a_{2}}{d}u_{3}\\
+			a_{3}& 0& u_{4}}$
 	}	
 \end{document}

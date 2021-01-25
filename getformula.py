@@ -16,21 +16,18 @@ def main(args):
         
     # help: https://stackoverflow.com/questions/8085520/generating-pdf-latex-with-python-script
     content = r'''\documentclass[x11names]{report}
-    \usepackage{background}
+    \usepackage{xcolor}
+    \usepackage{amsmath}
     \definecolor{lightkhaki}{rgb}{0.94, 0.9, 0.55}
     \thispagestyle{empty}
-    \renewcommand\fbox{\fcolorbox{lightkhaki}{lightkhaki}}
-    \backgroundsetup{
-        scale=1,
-        angle=0,
-        opacity=1,
-        contents={\begin{tikzpicture}[remember picture,overlay]
-                \path [left color = lightkhaki,middle color = lightkhaki, right color = lightkhaki] (current page.south west)rectangle (current page.north east);
-        \end{tikzpicture}}
+    \renewcommand\arraystretch{1.2}
+    \renewcommand\fbox{\fcolorbox{%(color)s}{%(color)s}}
+    \newcommand{\specialMatrix}[1]{
+        \begin{%(matrix)s}#1\end{%(matrix)s}
     }
     \begin{document}
         \centering
-        \setlength{\fboxsep}{2em}
+        \setlength{\fboxsep}{0.2em}
         \fbox{
             $\displaystyle %(formula)s$
         }	
@@ -60,16 +57,27 @@ def main(args):
     image_files_number = len(glob.glob1(output_dir, '*.png'))
     output_image_file = os.path.join(output_dir, f'formula-{image_files_number}.png')
 
+    page_corner_offset = 5 # pixels
     for page in pages:
         # help: https://stackoverflow.com/questions/15474628/crop-the-border-of-an-image-using-pil
         nonwhite_positions = [(x,y) for x in range(page.size[0]) for y in range(page.size[1]) if page.getdata()[x+y*page.size[0]] != (255,255,255)]
-        rect = (min([x for x,y in nonwhite_positions]), min([y for x,y in nonwhite_positions]), max([x for x,y in nonwhite_positions]), max([y for x,y in nonwhite_positions]))
+        rect = (min([x for x,y in nonwhite_positions]) + page_corner_offset, min([y for x,y in nonwhite_positions]) + page_corner_offset, max([x for x,y in nonwhite_positions]) - page_corner_offset, max([y for x,y in nonwhite_positions]) - page_corner_offset)
         page.crop(rect).save(output_image_file, 'PNG')
 
     os.remove(file_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--formula', default='I = \int_0^h y^2\mathrm{d}A')
+    # parser.add_argument('-f', '--formula', default='I = \int_0^h y^2\mathrm{d}A')
+
+    parser.add_argument('-m', '--matrix', default='pmatrix', help='matrix for without brackets\
+                                                    pmatrix for with parentheses brackets\
+                                                    bmatrix for with brackets\
+                                                    vmatrix for with vertical bar brackets\
+                                                    Vmatrix for with double vertical bar brackets\
+                                                    Bmatrix for with curly brackets as shown at top'
+                        )
+    parser.add_argument('-f', '--formula', default=r'\specialMatrix{a_{1}& u_{2}& \frac{a_{1}}{d}u_{3}\\a_{2}& u_{1}& \frac{a_{2}}{d}u_{3}\\a_{3}& 0& u_{4}}')
+    parser.add_argument('-c', '--color', default='lightkhaki')
     args = parser.parse_args()
     main(args)
